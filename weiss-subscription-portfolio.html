@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Subscription Analytics Portfolio | Anel Henning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f0f4ff; color: #1e293b; }
+
+    /* ── NAV ── */
+    nav { background: #0f2557; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+    .nav-brand { color: white; font-size: 1rem; font-weight: 700; padding: 1rem 0; }
+    .nav-brand span { color: #60a5fa; }
+    .nav-links { display: flex; gap: 0; }
+    .nav-link { color: #cbd5e1; padding: 1.2rem 0.9rem; font-size: 0.8rem; font-weight: 500; border-bottom: 3px solid transparent; transition: all 0.2s; cursor: pointer; text-decoration: none; }
+    .nav-link:hover, .nav-link.active { color: white; border-bottom-color: #60a5fa; background: rgba(255,255,255,0.05); }
+
+    /* ── HERO ── */
+    .hero { background: linear-gradient(135deg, #0f2557 0%, #1e3a8a 60%, #2563eb 100%); color: white; padding: 3.5rem 2rem 3rem; text-align: center; }
+    .hero-badge { display: inline-block; background: rgba(96,165,250,0.2); border: 1px solid rgba(96,165,250,0.5); color: #93c5fd; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.3rem 0.9rem; border-radius: 999px; margin-bottom: 1rem; }
+    .hero h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero p { font-size: 1.05rem; color: #bfdbfe; max-width: 640px; margin: 0 auto 1.5rem; }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .tag { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #e0e7ff; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem; }
+    .section-title { font-size: 1.4rem; font-weight: 800; color: #0f2557; margin-bottom: 0.35rem; }
+    .section-sub  { font-size: 0.9rem; color: #64748b; margin-bottom: 1.75rem; }
+
+    /* ── KPI ROW ── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
+    @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 560px) { .kpi-grid { grid-template-columns: 1fr 1fr; } }
+    .kpi { background: white; border-radius: 12px; padding: 1.25rem 1rem; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-top: 4px solid #2563eb; }
+    .kpi.green  { border-top-color: #16a34a; }
+    .kpi.red    { border-top-color: #dc2626; }
+    .kpi.amber  { border-top-color: #d97706; }
+    .kpi.purple { border-top-color: #7c3aed; }
+    .kpi-val  { font-size: 2rem; font-weight: 800; color: #0f2557; line-height: 1.1; }
+    .kpi-lbl  { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: #64748b; margin-top: 0.3rem; font-weight: 600; }
+    .kpi-delta { font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; }
+    .up   { color: #16a34a; }
+    .down { color: #dc2626; }
+
+    /* ── CARDS ── */
+    .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+    .card h3 { color: #0f2557; font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .card .subtitle { color: #64748b; font-size: 0.85rem; margin-bottom: 1.25rem; }
+    .grid-2 { display: grid; gap: 1.5rem; }
+    @media (min-width: 760px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    .grid-3 { display: grid; gap: 1.5rem; }
+    @media (min-width: 900px) { .grid-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+    /* ── CHART CONTAINERS ── */
+    .chart-wrap { position: relative; height: 220px; width: 100%; }
+    .chart-wrap-tall { position: relative; height: 280px; width: 100%; }
+
+    /* ── SCENARIO CARDS ── */
+    .scenario { border-left: 4px solid #2563eb; padding-left: 1rem; margin-bottom: 1.25rem; }
+    .scenario.warn  { border-color: #d97706; }
+    .scenario.alert { border-color: #dc2626; }
+    .scenario.good  { border-color: #16a34a; }
+    .scenario-title { font-weight: 700; font-size: 0.95rem; color: #0f2557; }
+    .scenario-body  { font-size: 0.85rem; color: #475569; line-height: 1.6; margin-top: 0.25rem; }
+    .scenario-action { margin-top: 0.5rem; background: #eff6ff; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.82rem; color: #1d4ed8; font-weight: 500; }
+
+    /* ── FUNNEL ── */
+    .funnel { display: flex; flex-direction: column; gap: 0.5rem; }
+    .funnel-step { display: flex; align-items: center; gap: 0.75rem; }
+    .funnel-bar-wrap { flex: 1; background: #f1f5f9; border-radius: 999px; height: 28px; overflow: hidden; }
+    .funnel-bar { height: 100%; border-radius: 999px; display: flex; align-items: center; padding-left: 0.75rem; font-size: 0.75rem; font-weight: 600; color: white; transition: width 1s ease; }
+    .funnel-label { width: 140px; font-size: 0.8rem; font-weight: 600; color: #374151; text-align: right; }
+    .funnel-pct   { width: 48px; font-size: 0.8rem; color: #64748b; text-align: right; }
+    .drop-arrow { font-size: 0.75rem; color: #dc2626; margin-left: 0.5rem; font-weight: 700; }
+
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #f8fafc; padding: 0.7rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; }
+    tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+    .badge.green  { background: #dcfce7; color: #166534; }
+    .badge.red    { background: #fee2e2; color: #991b1b; }
+    .badge.amber  { background: #fef3c7; color: #92400e; }
+    .badge.blue   { background: #dbeafe; color: #1e40af; }
+
+    /* ── INSIGHT BOX ── */
+    .insight { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 1rem 1.25rem; margin-top: 1rem; }
+    .insight-title { font-size: 0.8rem; font-weight: 700; color: #1d4ed8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.4rem; }
+    .insight p { font-size: 0.85rem; color: #1e3a8a; line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer { background: #0f2557; color: #94a3b8; text-align: center; padding: 1.5rem; font-size: 0.8rem; margin-top: 3rem; }
+    footer strong { color: #60a5fa; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Logical<span>Coders</span></div>
+  <div class="nav-links">
+    <a class="nav-link" href="#">GRC Suite</a>
+    <a class="nav-link active" href="#">Subscription Analytics</a>
+    <a class="nav-link" href="#">AI Projects</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">Portfolio — Senior Online Subscription Manager</div>
+  <h1>Subscription Metrics &amp; Growth Analytics</h1>
+  <p>Real-world scenario analysis demonstrating command of CAC, LTV, MRR, churn, and funnel optimization for a financial research subscription business.</p>
+  <div class="hero-tags">
+    <span class="tag">CAC Analysis</span>
+    <span class="tag">LTV Modeling</span>
+    <span class="tag">Churn Reduction</span>
+    <span class="tag">MRR Tracking</span>
+    <span class="tag">Funnel Drop-off</span>
+    <span class="tag">Investment Research Context</span>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── SECTION 1: Live KPI Dashboard ── -->
+  <div style="margin-bottom: 0.5rem;">
+    <div class="section-title">Live Subscription Dashboard</div>
+    <div class="section-sub">Simulated metrics for a financial ratings &amp; research publisher — modeled on the Weiss Ratings business model (tiered newsletters, alerts, and premium research)</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi green">
+      <div class="kpi-val">$312K</div>
+      <div class="kpi-lbl">MRR</div>
+      <div class="kpi-delta up">▲ 8.4% MoM</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">$148</div>
+      <div class="kpi-lbl">CAC Blended</div>
+      <div class="kpi-delta up">▼ $12 vs. last Q</div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-val">$1,840</div>
+      <div class="kpi-lbl">Avg. LTV</div>
+      <div class="kpi-delta up">LTV:CAC = 12.4×</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-val">3.2%</div>
+      <div class="kpi-lbl">Monthly Churn</div>
+      <div class="kpi-delta down">▲ 0.4 pts — needs attention</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-val">4,210</div>
+      <div class="kpi-lbl">Active Subscribers</div>
+      <div class="kpi-delta up">▲ 180 net new</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: MRR Chart ── -->
+  <div class="grid-2" style="margin-bottom:1.5rem;">
+    <div class="card">
+      <h3>MRR Growth — 12-Month Trend</h3>
+      <p class="subtitle">Monthly Recurring Revenue with new, expansion, and churned revenue breakdown</p>
+      <div class="chart-wrap">
+        <canvas id="mrrChart"></canvas>
+      </div>
+      <div class="insight">
+        <div class="insight-title">Manager Insight</div>
+        <p>MRR grew 68% over the year driven by a March email re-engagement campaign and a June upgrade offer to annual plans. Churned MRR spiked in September — correlates with a delayed market alert issue that eroded trust in the premium tier.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Churn Rate vs. Retention Target</h3>
+      <p class="subtitle">Monthly churn % vs. 2.5% target threshold — with intervention markers</p>
+      <div class="chart-wrap">
+        <canvas id="churnChart"></canvas>
+      </div>
+      <div class="insight">
+        <div class="insight-title">Manager Insight</div>
+        <p>Churn exceeded the 2.5% target in 3 of the last 12 months. The win-back email sequence deployed in November recovered 42 lapsed subscribers at a re-acquisition cost of $31 each — 5× cheaper than new CAC.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: Funnel ── -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <h3>Subscription Conversion Funnel — Email Campaign to Paid</h3>
+    <p class="subtitle">Weiss-style funnel: broadcast alert email → free report download → trial → paid subscription</p>
+    <div class="funnel" id="funnelViz">
+      <div class="funnel-step">
+        <div class="funnel-label">Email Sent</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#1d4ed8;">85,000</div></div>
+        <div class="funnel-pct">100%</div>
+      </div>
+      <div style="font-size:0.75rem;color:#dc2626;padding-left:148px;font-weight:600;">▼ 18% open rate — dropped 82,000</div>
+      <div class="funnel-step">
+        <div class="funnel-label">Email Opens</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:18%;background:#2563eb;">15,300</div></div>
+        <div class="funnel-pct">18%</div>
+      </div>
+      <div style="font-size:0.75rem;color:#dc2626;padding-left:148px;font-weight:600;">▼ 41% click-through — dropped 9,000</div>
+      <div class="funnel-step">
+        <div class="funnel-label">Landing Clicks</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:7.5%;background:#3b82f6;">6,375</div></div>
+        <div class="funnel-pct">7.5%</div>
+      </div>
+      <div style="font-size:0.75rem;color:#dc2626;padding-left:148px;font-weight:600;">▼ 68% abandon at form — dropped 4,335</div>
+      <div class="funnel-step">
+        <div class="funnel-label">Free Report DL</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2.4%;background:#60a5fa;">2,040</div></div>
+        <div class="funnel-pct">2.4%</div>
+      </div>
+      <div style="font-size:0.75rem;color:#dc2626;padding-left:148px;font-weight:600;">▼ 77% trial drop — only 23% upgrade</div>
+      <div class="funnel-step">
+        <div class="funnel-label">Trial Started</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:0.55%;background:#16a34a;">469</div></div>
+        <div class="funnel-pct">0.55%</div>
+      </div>
+      <div style="font-size:0.75rem;color:#16a34a;padding-left:148px;font-weight:600;">✓ 63% trial-to-paid conversion</div>
+      <div class="funnel-step">
+        <div class="funnel-label">Paid Subscriber</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:0.35%;background:#166534;">295</div></div>
+        <div class="funnel-pct">0.35%</div>
+      </div>
+    </div>
+    <div class="insight" style="margin-top:1.25rem;">
+      <div class="insight-title">Drop-off Analysis &amp; Recommended Actions</div>
+      <p><strong>Biggest leak: landing page form (68% abandon).</strong> A/B test a 1-field email-only capture before showing the full form — projected lift: +35% downloads. <strong>Second leak: email open rate (18%).</strong> Subject line testing with urgency framing ("Alert: 3 stocks rated SELL today") projected to push opens to 24–26%, adding ~100 paid subs per campaign at current funnel rates.</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 4: LTV / CAC by Channel ── -->
+  <div class="card" style="margin-bottom:1.5rem;">
+    <h3>CAC vs. LTV by Acquisition Channel</h3>
+    <p class="subtitle">Understanding which channels deliver the highest-value subscribers — critical for budget allocation</p>
+    <div class="chart-wrap-tall">
+      <canvas id="cacLtvChart"></canvas>
+    </div>
+    <div class="insight" style="margin-top:1rem;">
+      <div class="insight-title">Budget Recommendation</div>
+      <p>Organic search and direct mail deliver the best LTV:CAC ratios (18× and 14× respectively). Paid social has a high CAC and below-average LTV — subscribers acquired here show 40% higher 90-day churn. Recommend shifting 20% of paid social budget to SEO content and list-based direct mail for the next quarter.</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 5: Scenario Analysis ── -->
+  <div style="margin-bottom:0.5rem;">
+    <div class="section-title">Real-World Scenario Interpretations</div>
+    <div class="section-sub">How I would diagnose and respond to these subscription health signals</div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:1.5rem;">
+    <div class="card">
+      <div class="scenario alert">
+        <div class="scenario-title">Scenario A — Churn Spike After Price Increase</div>
+        <div class="scenario-body">MRR holds flat month-over-month, but active subscriber count drops 8% following a $20 annual price increase. New revenue from the increase is masking a churn crisis in the making.</div>
+        <div class="scenario-action">Action: Segment churned users by tenure. If &gt;60% are &lt;6-month subscribers, the price point hit new customers hardest. Introduce a loyalty lock-in offer (grandfather pricing for &gt;12-month subs) and a lower-cost tier to retain price-sensitive leads.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="scenario warn">
+        <div class="scenario-title">Scenario B — Low Trial-to-Paid Conversion</div>
+        <div class="scenario-body">Trial starts are up 30% from a successful campaign, but conversion to paid has dropped from 65% to 38%. Acquisition cost is rising with no revenue payoff.</div>
+        <div class="scenario-action">Action: Audit the trial onboarding email sequence. Ensure subscribers receive at least one high-value alert or market call during the trial window — for a financial ratings product, value must be demonstrated, not just described. Add a "Your first SELL-rated stock" trigger email on day 3.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="scenario good">
+        <div class="scenario-title">Scenario C — Expansion MRR Opportunity</div>
+        <div class="scenario-body">Behavioral data shows 22% of base-tier subscribers are clicking on premium content 5+ times per month, but never upgrading. They are self-selecting as upgrade candidates.</div>
+        <div class="scenario-action">Action: Trigger an in-app upsell modal after the 4th premium content view. Offer a 14-day free upgrade. This segment has demonstrated intent — a soft nudge has historically converted at 2–3× the rate of cold upsell campaigns.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 6: Cohort Retention Table ── -->
+  <div class="card">
+    <h3>Cohort Retention Table — Quarterly Subscriber Cohorts</h3>
+    <p class="subtitle">Tracking what % of each cohort remains subscribed at 3, 6, 9, and 12 months — the core of LTV modeling</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Cohort</th>
+          <th>Starting Subs</th>
+          <th>Month 3</th>
+          <th>Month 6</th>
+          <th>Month 9</th>
+          <th>Month 12</th>
+          <th>Avg. LTV</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Q1 2025</strong></td>
+          <td>620</td>
+          <td><span class="badge green">91%</span></td>
+          <td><span class="badge green">83%</span></td>
+          <td><span class="badge amber">74%</span></td>
+          <td><span class="badge amber">68%</span></td>
+          <td>$2,140</td>
+          <td><span class="badge green">Strong</span></td>
+        </tr>
+        <tr>
+          <td><strong>Q2 2025</strong></td>
+          <td>810</td>
+          <td><span class="badge green">88%</span></td>
+          <td><span class="badge amber">76%</span></td>
+          <td><span class="badge red">61%</span></td>
+          <td>—</td>
+          <td>$1,620</td>
+          <td><span class="badge amber">Watch</span></td>
+        </tr>
+        <tr>
+          <td><strong>Q3 2025</strong></td>
+          <td>950</td>
+          <td><span class="badge amber">82%</span></td>
+          <td><span class="badge red">69%</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>$1,180 (proj.)</td>
+          <td><span class="badge red">At Risk</span></td>
+        </tr>
+        <tr>
+          <td><strong>Q4 2025</strong></td>
+          <td>1,140</td>
+          <td><span class="badge green">90%</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td>$2,050 (proj.)</td>
+          <td><span class="badge green">Strong Start</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="insight" style="margin-top:1rem;">
+      <div class="insight-title">Cohort Interpretation</div>
+      <p>Q3 2025 cohort shows accelerated churn at month 6 — this aligns with the September alert delivery issue. Q4 bounced back strongly, suggesting product/delivery was fixed and the brand recovered. Q2 month-9 drop (61%) warrants a targeted win-back campaign to the ~310 subscribers still active in that cohort before they reach month 12.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Built by <strong>Anel Henning</strong> · Subscription Analytics Portfolio · Targeting Senior Online Subscription Manager, Weiss Ratings
+</footer>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const months = ['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
+
+// MRR CHART
+new Chart(document.getElementById('mrrChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [
+      { label: 'New MRR', data: [22,25,18,28,35,31,29,38,52,44,48,55], backgroundColor: '#2563eb' },
+      { label: 'Expansion MRR', data: [8,9,7,10,12,14,11,15,18,16,20,22], backgroundColor: '#16a34a' },
+      { label: 'Churned MRR', data: [-12,-10,-18,-9,-8,-11,-13,-9,-10,-11,-12,-10], backgroundColor: '#dc2626' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+    scales: {
+      x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+      y: { stacked: true, ticks: { callback: v => '$'+v+'K', font: { size: 11 } }, grid: { color: '#f1f5f9' } }
+    }
+  }
+});
+
+// CHURN CHART
+new Chart(document.getElementById('churnChart'), {
+  type: 'line',
+  data: {
+    labels: months,
+    datasets: [
+      {
+        label: 'Monthly Churn %',
+        data: [2.1, 2.4, 3.8, 2.2, 1.9, 2.0, 2.3, 1.8, 2.1, 2.6, 3.1, 3.2],
+        borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.08)', borderWidth: 2.5,
+        pointBackgroundColor: '#dc2626', tension: 0.3, fill: true
+      },
+      {
+        label: 'Target (2.5%)',
+        data: Array(12).fill(2.5),
+        borderColor: '#16a34a', borderDash: [6,4], borderWidth: 2, pointRadius: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      y: { ticks: { callback: v => v+'%', font: { size: 11 } }, grid: { color: '#f1f5f9' }, min: 0, max: 5 }
+    }
+  }
+});
+
+// CAC vs LTV CHART
+new Chart(document.getElementById('cacLtvChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Organic Search', 'Direct Mail', 'Email Partner', 'Paid Search', 'Paid Social', 'Affiliate'],
+    datasets: [
+      { label: 'CAC ($)', data: [85, 120, 165, 200, 310, 175], backgroundColor: '#2563eb', yAxisID: 'y' },
+      { label: 'LTV ($)', data: [1530, 1680, 1420, 1210, 840, 1100], backgroundColor: '#16a34a', yAxisID: 'y2' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+      y:  { position: 'left',  ticks: { callback: v => '$'+v, font: { size: 11 } }, grid: { color: '#f1f5f9' }, title: { display: true, text: 'CAC ($)', font: { size: 11 } } },
+      y2: { position: 'right', ticks: { callback: v => '$'+v, font: { size: 11 } }, grid: { display: false }, title: { display: true, text: 'LTV ($)', font: { size: 11 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>
